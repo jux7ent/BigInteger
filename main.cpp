@@ -2,6 +2,8 @@
 #include <cstring>
 #include <stdexcept>
 
+using namespace std;
+
 typedef long long val_type;
 
 class BigIntegerDivisionByZero : std::logic_error {
@@ -117,6 +119,10 @@ public:
     BigInteger &operator%=(const BigInteger &a);
 
     int compare(const BigInteger &a) const;
+
+    BigInteger sqrt();
+
+    BigInteger gcd(const BigInteger &q);
 
 };
 
@@ -237,11 +243,11 @@ BigInteger::array &BigInteger::array::operator=(const array &val) {
 }
 
 
-BigInteger::BigInteger() : array({0}), negative_(0) {}
+BigInteger::BigInteger() : digits_({0}), negative_(0) {}
 
-BigInteger::BigInteger(const BigInteger &copy) : array(copy.digits_), negative_(copy.negative_) {}
+BigInteger::BigInteger(const BigInteger &copy) : digits_(copy.digits_), negative_(copy.negative_) {}
 
-BigInteger::BigInteger(long long integer) : array({integer}), negative_(integer < 0) {
+BigInteger::BigInteger(long long integer) : digits_({integer}), negative_(integer < 0) {
     if (digits_[0] < 0) {
         digits_[0] *= -1;
     }
@@ -255,7 +261,7 @@ BigInteger::BigInteger(const char *string) {
     negative_ = (string[0] == '-');
 
     long long digit = 0, multiplier = 1;
-    for (int i = strlen(string) - 1; i >= negative_; --i) {
+    for (size_t i = strlen(string) - 1; i >= negative_; --i) {
         digit += multiplier * (string[i] - '0');
         multiplier *= 10;
         if (multiplier >= base_) {
@@ -506,6 +512,40 @@ int BigInteger::compare(const BigInteger &a) const {
     return 0;
 }
 
+BigInteger BigInteger::sqrt() {
+    BigInteger left = 1, right = *this;
+    BigInteger middle;
+
+    if (*this != 1) {
+        while (left + 1 < right) {
+            middle = left + ((right - left) / 2);
+
+            if (middle * middle <= *this) {
+                left = middle;
+            } else {
+                right = middle;
+            }
+        }
+    }
+
+    return left;
+}
+
+BigInteger BigInteger::gcd(const BigInteger &a) {
+    BigInteger q = *this, w = a;
+
+    while (q != 0 && w != 0) {
+        if (q > w) {
+            q = q % w;
+        }
+        else {
+            w = w % q;
+        }
+    }
+
+    return q + w;
+}
+
 bool operator>(const BigInteger &a, const BigInteger &b) {
     return a.compare(b) == 1;
 }
@@ -530,6 +570,4 @@ bool operator!=(const BigInteger &a, const BigInteger &b) {
     return a.compare(b) != 0;
 }
 
-int main() {
-
-}
+int main() {}
