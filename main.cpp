@@ -261,7 +261,7 @@ BigInteger::BigInteger(const char *string) {
     negative_ = (string[0] == '-');
 
     long long digit = 0, multiplier = 1;
-    for (size_t i = strlen(string) - 1; i >= negative_; --i) {
+    for (int i = int(strlen(string) - 1); i >= negative_; --i) {
         digit += multiplier * (string[i] - '0');
         multiplier *= 10;
         if (multiplier >= base_) {
@@ -570,4 +570,10 @@ bool operator!=(const BigInteger &a, const BigInteger &b) {
     return a.compare(b) != 0;
 }
 
-int main() {}
+int main() {
+    BigInteger a, b;
+    cin >> a >> b;
+    cout << a + b << endl;
+
+    return 0;
+}
